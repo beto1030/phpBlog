@@ -1,3 +1,4 @@
 # Check github repo: (https://github.com/github/gitignore/blob/master/Global/macOS.gitignore) as a .gitignore cheatsheet
 # General
+.git
 .DS_Store
