@@ -1,18 +1,25 @@
 
 	<?php require_once 'includes/header.php'; 
 	require_once 'classes/entry.php';
-
 	if (isset($_POST['publishing'])) {
+        echo "inside if submited";
+        
+        //*** the problem is with these three lines the entry.php has a problem. when i try to execute these 3 lines below the create.php page breaks after submitting the form. the form should reappear but does not show up. ***
 
+        echo "</br><br/>create.php - new Entry()";
 		$entry = new Entry();
-		$entry->createNewFromPOST($_POST);
+        echo "</br><br/>//// create.php - new Entry()";
 
-		$entry->SqlInsertEntry();
+        echo "</br></br>create.php - createNewFromPOST()";
+		$entry->createNewFromPOST($_POST);
+        echo "</br></br>////create.php - createNewFromPOST()";
+
+        echo "</br></br>SqlInsertEntry";
+        $entry->SqlInsertEntry();//this is the problem
+        echo "</br></br>////SqlInsertEntry";
 ?>
 	<a href="single.php?entry_id=<?php echo $entry->getId(); ?>">View Entry</a>
-<?php
-	}
-	?>
+<?php } ?>
 
 				<!-- Main -->
 					<div id="main">

@@ -10,8 +10,15 @@ class Entry {
     private $dbh;
     private $error;
 
+    /* this constructor establishes the connection to the database */
     public function __construct() {
-        $this->dbh = new PDO("mysql:dbname=blog_tut;host=localhost;", 'root', '');
+        //echo "</br>entry.php - new Entry() instance made!";
+        $dsn = "mysql:host=localhost;dbname=blog_tut";
+        $username = "root";
+        $password = "";
+    
+        $this->dbh = new PDO($dsn, $username, $password);
+        //echo "end";
     }
 
     public function createNew( $author, $title, $excerpt, $content ) {
@@ -19,6 +26,7 @@ class Entry {
     }
 
     public function createNewFromPOST( $post ) {
+        echo "</br>inside createNewFromPOST()";
         //print_r($post);
         $this->createNew(
             $post['entry_author'],
@@ -26,6 +34,7 @@ class Entry {
             $post['entry_excerpt'],
             $post['entry_content']
         );
+        echo "end";
     }
 
     public function setByParams( $id, $date, $author, $title, $excerpt, $content ) {
@@ -53,26 +62,72 @@ class Entry {
         );
     }
 
+
+    /* function dealing with sql code */
     public function SqlInsertEntry() {
+        echo "</br>made it into SqlInsertEntry()";
         $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        echo "<br><br>70<br><br>";
 
+        // echo "<br>";
+        // echo $this->date;
+        // echo "<br>";
+        // echo $this->author;
+        // echo "<br>";
+        // echo $this->title;
+        // echo "<br>";
+        // echo $this->excerpt;
+        // echo "<br>";
+        // echo $this->content;
+        
+        $date = $this->date;
+        echo "<br>" . $date;
+        $author = $this->author;
+        echo "<br>" . $author;
+        $title = $this->title;
+        echo "<br>" . $title;
+        $excerpt = $this->excerpt;
+        echo "<br>" . $excerpt;
+        $content =$this->content;
+        echo "<br>" . $content;
 
-        $query = ' 
-            INSERT INTO entries (
-                entry_author, entry_date, entry_excerpt, entry_title,
-                entry_content)
-            VALUES (
-                :entry_author, :entry_date, :entry_excerpt, :entry_title,
-                :entry_content);';
+        //$query = 'INSERT INTO entries (entry_date, entry_author, entry_title, entry_excerpt, entry_content) VALUES (?, ?, ?, ?, ?);';
+        //$query = 'INSERT INTO entries (entry_author, entry_title, entry_excerpt, entry_content) VALUES (?, ?, ?, ?);';
 
-        $stmt = $this->dbh->prepare($query);
-        $result = $stmt->execute(array(
-            ':entry_author' => $this->author,
-            ':entry_date' => $this->date,
-            ':entry_excerpt' => $this->excerpt,
-            ':entry_title' => $this->title,
-            ':entry_content' => $this->content
-        ));
+        //$stmt = $this->dbh->prepare('INSERT INTO entries (entry_author, entry_title, entry_excerpt, entry_content) VALUES (:entry_author, :entry_title, :entry_excerpt, :entry_content);');
+        try{
+            date_default_timezone_set('America/Los_Angeles');
+            //$date = date_default_timezone_get();
+            //echo "The current date is " . $date('Y');
+            $query = 'INSERT INTO entries (entry_date, entry_author, entry_title, entry_excerpt, entry_content) VALUES (:entry_date, :entry_author, :entry_title, :entry_excerpt, :entry_content)';
+            $stmt = $this->dbh->prepare($query);
+
+            //Bind parameters to statment
+            $stmt->bindParam(':entry_date', date("Y") , PDO::PARAM_STR);
+            $stmt->bindParam(':entry_author', $_REQUEST['entry_author'], PDO::PARAM_STR);
+            $stmt->bindParam(':entry_title', $_REQUEST['entry_title'], PDO::PARAM_STR);
+            $stmt->bindParam(':entry_excerpt', $_REQUEST['entry_excerpt'], PDO::PARAM_STR);
+            $stmt->bindParam(':entry_content', $_REQUEST['entry_content'], PDO::PARAM_STR);
+
+            echo "<br><br>before execute()<br><br>";
+            $stmt->execute();
+            echo "<br><br>after execute()<br><br>";
+            //$stmt->execute(["$this->date", "$this->author", "$this->title", "$this->excerpt", "$this->content"]);
+
+            echo "<br><br>80<br><br>";//code breakes after this line the problem seems to be with $result varible
+        }catch(PDOException $e) {
+            die("ERROR: Could not prepare/execute query: $query. " . $e->getMessage()); 
+        }
+
+       //$result = $stmt->execute([$date, $author, $title, $excerpt, $content]);
+       //$result = $stmt->execute(array("Feb 3", "alberto alvarado", "title_here", "summary_here", "content_here"));
+       //
+       //**** THE PROBLEM IS HERE. Find out how to properly "bind" the placeholder and the value corresponding from the user input from the form.
+       //$result = $stmt->execute(array(':entry_date' =>  echo $this->date , ':entry_author' => echo $this->author, ':entry_title' => echo $this->title , ':entry_excerpt' => echo $this->excerpt, ':entry_content' => echo $this->content));
+        
+        echo "<br><br>88<br><br>";
+
+        //echo $result;
         $this->error = $this->dbh->errorInfo();
         //print_r($this->error);
 
@@ -83,6 +138,9 @@ class Entry {
                     DESC LIMIT 1;';
 
         $stmt = $this->dbh->prepare($query);
+
+        echo "<br><br>128<br><br>";
+
         $stmt->execute(array(
             ':entry_author' => $this->author
         ));
@@ -95,6 +153,7 @@ class Entry {
 
         $this->id = $row['entry_id'];
 
+        echo "<br><br>141<br><br>";
         return $result;
     }
 
@@ -135,6 +194,7 @@ class Entry {
             ':entry_title' => $this->title,
             ':entry_content' => $this->content
         ));
+        print_r($result);
 
         return $result;
     }
@@ -143,6 +203,7 @@ class Entry {
         
     }
 
+    /*------- GETTERS and SETTERS of database entries ---------*/
     /**
      * Get the value of id
      */ 

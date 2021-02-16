@@ -9,39 +9,63 @@ require_once 'classes/entry.php';
 					<div id="main">
 <?php 
 
-$query = 'SELECT * FROM entries ORDER BY entry_id DESC LIMIT 7;';
+//$query = 'SELECT * FROM entries ORDER BY entry_id DESC LIMIT 7;';
+$query = 'SELECT * FROM entries;';
 
 require_once('classes/dbh.php');
-
-$dbh = new Dbh();
+try {
+    $dbh = new Dbh();
+    //echo "You have successfully connected to your database!<br/>";
+} catch(PDOException $e) {
+    echo "Error!: " . $e->getMessage() . "<br/>"; 
+    die();
+}
 
 $rows = $dbh->executeSelect($query);
-
 //print_r($rows);
 
 foreach ($rows as $row) {
 	$entry = new Entry();
-
 	$entry->setByRow($row);
+}
 
+//loop through title's from posts
+//for($i = 0; $i < count($rows); $i++){
+//    print_r($rows[$i]["entry_title"] . "<br>");
+//}
+
+echo "<br>";
+echo "<br>";
+
+//loop through $rows array
+//$arrObject = new ArrayObject($rows);
+//$arrayIterator = $arrObject->getIterator();
+//
+//while($arrayIterator->valid()){
+//    echo $arrayIterator->current() . "<br />";
+//    $arrayIterator->next();
+//}
 ?>
 						<!-- Post -->
+<?php
+    for($i = 0; $i < count($rows); $i++){
+?>
 							<article class="post">
 								<header>
 									<div class="title">
-										<h2><a href="single.php?entry_id=<?php echo $entry->getId(); ?>"><?php echo $entry->getTitle(); ?></a></h2>
+										<h2><a href="single.php?entry_id=<?php echo $rows[$i]["entry_id"]; ?>"><?php echo $rows[$i]["entry_title"]; ?></a></h2>
 									</div>
 									<div class="meta">
-										<time class="published"><?php echo $entry->getDate(); ?></time>
-										<a href="#" class="author"><span class="name">><?php echo $entry->getAuthor(); ?></span><img src="images/avatar.jpg" alt="" /></a>
+										<time class="published"><?php echo $rows[$i]["entry_date"]; ?></time>
+										<a href="#" class="author"><span class="name"><?php echo $entry->getAuthor(); ?></span><img src="images/avatar.jpg" alt="" /></a>
 									</div>
 								</header>
 								<div class="excerpt">
-								<?php echo $entry->getExcerpt(); ?>
+								<?php echo $rows[$i]["entry_excerpt"]; ?>
 								</div>
 								<footer>
 									<ul class="actions">
-										<li><a href="#" class="button big">Continue Reading</a></li>
+										<li><a href="single.php?entry_id=<?php echo $rows[$i]["entry_id"]; ?>" class="button big">Continue Reading</a></li>
 									</ul>
 									<ul class="stats">
 										<li><a href="#">General</a></li>
@@ -50,7 +74,9 @@ foreach ($rows as $row) {
 									</ul>
 								</footer>
 							</article>
-<?php } ?>
+<?php  
+}
+?>
 				
 						<!-- Pagination -->
 							<ul class="actions pagination">
@@ -67,16 +93,17 @@ foreach ($rows as $row) {
 							<section id="intro">
 								<a href="#" class="logo"><img src="images/logo.jpg" alt="" /></a>
 								<header>
-									<h2>Future Imperfect</h2>
-									<p>Another fine responsive site template by <a href="http://html5up.net">HTML5 UP</a></p>
+									<h2>Web Development Tutorials</h2>
+									<p>Just another aspiring web developer looking to help.</p>
+                                    <p>Feel free to send me a email requesting me ideas for upcoming tutorials. <a href="mailto:betoalvarado1030@gmail.com"><b> Email me  (click here)</b></a></p>
 								</header>
 							</section>
 
 						<!-- Mini Posts -->
-							<section>
+							<!-- <section>
 								<div class="mini-posts">
 
-									<!-- Mini Post -->
+									<!- - Mini Post - ->
 										<article class="mini-post">
 											<header>
 												<h3><a href="#">Vitae sed condimentum</a></h3>
@@ -86,7 +113,7 @@ foreach ($rows as $row) {
 											<a href="#" class="image"><img src="images/pic04.jpg" alt="" /></a>
 										</article>
 
-									<!-- Mini Post -->
+									<!- - Mini Post - ->
 										<article class="mini-post">
 											<header>
 												<h3><a href="#">Rutrum neque accumsan</a></h3>
@@ -96,7 +123,7 @@ foreach ($rows as $row) {
 											<a href="#" class="image"><img src="images/pic05.jpg" alt="" /></a>
 										</article>
 
-									<!-- Mini Post -->
+									<!- - Mini Post - ->
 										<article class="mini-post">
 											<header>
 												<h3><a href="#">Odio congue mattis</a></h3>
@@ -106,7 +133,7 @@ foreach ($rows as $row) {
 											<a href="#" class="image"><img src="images/pic06.jpg" alt="" /></a>
 										</article>
 
-									<!-- Mini Post -->
+									<!- - Mini Post - ->
 										<article class="mini-post">
 											<header>
 												<h3><a href="#">Enim nisl veroeros</a></h3>
@@ -118,9 +145,10 @@ foreach ($rows as $row) {
 
 								</div>
 							</section>
+                            -->
 
 						<!-- Posts List -->
-							<section>
+							<!-- <section>
 								<ul class="posts">
 									<li>
 										<article>
@@ -169,11 +197,29 @@ foreach ($rows as $row) {
 									</li>
 								</ul>
 							</section>
+                            -->
 
 						<!-- About -->
 							<section class="blurb">
-								<h2>About</h2>
-								<p>Mauris neque quam, fermentum ut nisl vitae, convallis maximus nisl. Sed mattis nunc id lorem euismod amet placerat. Vivamus porttitor magna enim, ac accumsan tortor cursus at phasellus sed ultricies.</p>
+								<h2>About Me</h2>
+                                <p>Name: Alberto Alvarado</p> 
+                                <p>Email: betoalvarado1030@gmail.com</p>
+                                <p>
+                                    Reasons for making this blog:
+                                    <ul>
+                                        <li>I wanted to learn php and did so though creating this blog</li>
+                                        <li>I want to teach others about web development technologies such as 
+                                                     <ul>
+                                                        <li>HTML</li>
+                                                        <li>CSS</li>
+                                                        <li>JAVASCRIPT</li>
+                                                        <li>PHP</li>
+                                                     </ul>
+                                        </li>
+                                    </ul>
+                                </p>
+                                <p>
+                                
 								<ul class="actions">
 									<li><a href="#" class="button">Learn More</a></li>
 								</ul>
